@@ -1,6 +1,6 @@
 import requests
 from jsonschema import validate
-from resources.schemas import create_user_schema, list_user_schema, update_user_schema
+from resources.schemas import create_user_schema, list_user_schema, update_user_schema, get_user_schema
 
 
 def test_get_user_check_status_code():
@@ -46,9 +46,15 @@ def test_create_user_validate_schema():
     validate(response.json(), schema=create_user_schema)
 
 
+def test_get_user_validate_schema():
+    response = requests.get("https://reqres.in/api/users/2")
+    validate(response.json(), schema=get_user_schema)
+
+
 def test_list_users_validate_schema():
     response = requests.get("https://reqres.in/api/users", params={"page": 2})
     validate(response.json(), schema=list_user_schema)
+
 
 def test_update_user_validate_schema():
     """Здесь в схеме я поиграла с полями - убрала поле ypdateAt и выставила additionalProperties: False.
@@ -62,7 +68,7 @@ def test_get_user_returns_correct_user():
     "Как будто проверяю логику =)"
     id = 2
     response = requests.get(f"https://reqres.in/api/users/{id}")
-    assert response.json()["data"]["id"]==id
+    assert response.json()["data"]["id"] == id
 
 
 def test_creating_and_updating_user():
@@ -79,4 +85,4 @@ def test_creating_and_updating_user():
 
     response_get_user = requests.get(url)
     assert response_get_user.status_code == 404
-    #assert response_get_user.json()["data"]["name"]==response_update.json()["name"]
+    # assert response_get_user.json()["data"]["name"]==response_update.json()["name"]
